@@ -1,7 +1,7 @@
 import { Context } from "@oak/oak";
 
 type WebSocketWithUsername = WebSocket & { username: string };
-type AppEvent = { event: string; [key: string]: any };
+type AppEvent = { event: string; [key: string]: string | string[] };
 
 export default class ChatServer {
     private connectedClients = new Map<string, WebSocketWithUsername>();
@@ -32,7 +32,7 @@ export default class ChatServer {
         console.log(`New client connected: ${username}`);
     }
 
-    private send(username: string, message: any) {
+    private send(username: string, message: MessageEvent) {
         const data = JSON.parse(message.data);
         if (data.event !== "send-message") {
             return;
@@ -60,6 +60,8 @@ export default class ChatServer {
     }
 
     private broadcast(message: AppEvent) {
+        console.log("appevent", message);
+
         const messageString = JSON.stringify(message);
         for (const client of this.connectedClients.values()) {
             client.send(messageString);
